@@ -1,4 +1,4 @@
-package ru.roman.retrofittest;
+package ru.roman.retrofittest.downloadMessage;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import retrofit2.http.GET;
 
 public interface MessagesApi {
 
-    @GET("messages1.json")
-    Call<List<Message>>messages();
+    @GET("messages.json")
+    Call<List<Messages>>messages();
 
 }
