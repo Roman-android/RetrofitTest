@@ -2,13 +2,15 @@ package ru.roman.retrofittest.insertText;
 
 public class ResponseInsert {
 
-    private String desc;
+    private String value;
+    private String message;
 
-    public String getDesc() {
-        return desc;
+    public String getValue() {
+        return value;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public String getMessage() {
+        return message;
     }
+
 }

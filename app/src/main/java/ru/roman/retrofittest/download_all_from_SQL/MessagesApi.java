@@ -1,4 +1,4 @@
-package ru.roman.retrofittest.downloadMessage;
+package ru.roman.retrofittest.download_all_from_SQL;
 
 import java.util.List;
 

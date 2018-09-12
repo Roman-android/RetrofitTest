@@ -5,21 +5,16 @@ public class Text {
     private long id;
     private String desc;
     private String text;
+    private String favour;
 
     public String getDesc() {
         return desc;
     }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
     public String getText() {
         return text;
     }
-
-    public void setText(String text) {
-        this.text = text;
+    public String getFavour() {
+        return favour;
     }
 
 }

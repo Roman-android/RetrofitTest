@@ -9,13 +9,11 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import ru.roman.retrofittest.Utils.DownloadFromSQL;
-import ru.roman.retrofittest.Utils.InsertIntoSQL;
+import ru.roman.retrofittest.utils.DownloadFromSQL;
 
 public class MainActivity extends AppCompatActivity {
 
     DownloadFromSQL downloadFromSQL;
-    InsertIntoSQL insertIntoSQL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         downloadFromSQL = new DownloadFromSQL();
-        insertIntoSQL = new InsertIntoSQL();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -35,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
 
                 downloadFromSQL.downloadText();
-                insertIntoSQL.insertText();
             }
         });
 
@@ -61,5 +57,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void OnPostRequest(View view) {
+        downloadFromSQL.postRequest();
+        //downloadFromSQL.testRequest();
     }
 }

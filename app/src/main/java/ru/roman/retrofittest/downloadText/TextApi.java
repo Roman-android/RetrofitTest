@@ -1,5 +1,8 @@
 package ru.roman.retrofittest.downloadText;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -25,9 +28,11 @@ public interface TextApi {
     @GET("get_all_json.php")
     Call<List<Text>> text(@Query("fav")int isFavour);
 
+    //@POST("insert.php")
     @POST("insert.php")
     @FormUrlEncoded
-    Call<ResponseInsert>saveText(@Field("desc")String desc);
-
+    Call<ResponseInsert>saveText(@Field("desc")String desc,
+                                 @Field("text")String text,
+                                 @Field("favour")String favour);
 
 }
