@@ -1,16 +1,26 @@
 package ru.roman.retrofittest.utils;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ru.roman.retrofittest.MainActivity;
 import ru.roman.retrofittest.download_all_from_SQL.Messages;
 import ru.roman.retrofittest.download_all_from_SQL.MessagesApi;
 import ru.roman.retrofittest.downloadText.Text;
@@ -18,12 +28,23 @@ import ru.roman.retrofittest.downloadText.TextApi;
 import ru.roman.retrofittest.insertText.ResponseInsert;
 import ru.roman.retrofittest.testPost.Post;
 import ru.roman.retrofittest.testPost.TestAPI;
+import ru.roman.retrofittest.uploadImage.ResponseUpload;
+
+import static android.app.Activity.RESULT_OK;
 
 public class DownloadFromSQL {
+
+    Context context;
+
+    public DownloadFromSQL(Context context) {
+        this.context = context;
+    }
+
     private final String LOG_DOWNLOAD = "main_download";
     private final String LOG_POST = "main_insert";
+    private final String LOG_UPLOAD = "main_upload";
 
-    //TextApi textApi;
+    private TextApi textApi = TextApi.retrofit.create(TextApi.class);
 
     public void downloadMessages() {
         String baseUrlExampl = "http://u47689.netangels.ru/";
@@ -52,8 +73,6 @@ public class DownloadFromSQL {
 
     public void downloadText() {
 
-        TextApi textApi = TextApi.retrofit.create(TextApi.class);
-
         Call<List<Text>> text = textApi.text(1);
         text.enqueue(new Callback<List<Text>>() {
             @Override
@@ -72,7 +91,6 @@ public class DownloadFromSQL {
     }
 
     public void postRequest() {
-        TextApi textApi = TextApi.retrofit.create(TextApi.class);
         Call<ResponseInsert> call = textApi.saveText("заголовок_1","мой_текст_1","1");
 
         call.enqueue(new Callback<ResponseInsert>() {
@@ -95,25 +113,42 @@ public class DownloadFromSQL {
         });
     }
 
-    public void testRequest (){
-        TestAPI testAPI = TestAPI.retrofiClient.create(TestAPI.class);
-        Call<Post> call = testAPI.savePost("myTitle_1","myBody_1",1);
-        call.enqueue(new Callback<Post>() {
+    public void uploadImg(String imagePath){
+        final ProgressDialog progressDialog;
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Идет загрузка");
+        progressDialog.show();
+
+        File file = new File(imagePath);
+
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"),file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("uploaded_file",file.getName(),requestFile);
+
+        Call <ResponseUpload> resultCall = textApi.uploadImg(body);
+        resultCall.enqueue(new Callback<ResponseUpload>() {
             @Override
-            public void onResponse(@NonNull Call<Post> call, @NonNull Response<Post> response) {
+            public void onResponse(Call<ResponseUpload> call, Response<ResponseUpload> response) {
+               progressDialog.dismiss();
                 if (response.isSuccessful()){
-                    Log.d("POST_REQUEST_SUCCESS",response.body().toString());
+                    if (response.body().getError()){
+                        Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_UPLOAD,"Путь к файлу: "+response.body().getMessage());
+                    }
                 }else {
-                    ResponseBody errorBody = response.errorBody();
-                    Log.d("POST_REQUEST_ERROR",errorBody.toString());
-                    Log.d("POST_REQUEST_ERROR", String.valueOf(response.code()));
+                    Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Post> call, Throwable t) {
-                //Log.e("POST_REQUEST", "Unable to submit post to API.");
+            public void onFailure(Call<ResponseUpload> call, Throwable t) {
+progressDialog.dismiss();
+                Toast.makeText(context, "Непредвиденная ошибка"+t.toString(), Toast.LENGTH_SHORT).show();
+                Log.d(LOG_UPLOAD,"Непредвиденная ошибка"+t.toString());
             }
         });
     }
+
+
 }

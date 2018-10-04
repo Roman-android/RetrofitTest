@@ -2,4 +2,6 @@
     <string name="app_name">RetrofitTest</string>
     <string name="action_settings">Settings</string>
     <string name="btn_post">Post запрос</string>
+    <string name="img_pick">Выбрать изображение</string>
+    <string name="img_upload">Загрузить изображение</string>
 </resources>
