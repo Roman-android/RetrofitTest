@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public void OnUploadImg(View view) {
         if (imagePath != null) {
             verifyStoragePermissions(MainActivity.this);
-            downloadFromSQL.uploadImg(imagePath);
+            downloadFromSQL.uploadImg(imagePath,imageView);
         } else {
             Toast.makeText(this, "Пожалуйста сначала выберите изображение!", Toast.LENGTH_SHORT).show();
         }
@@ -155,5 +155,8 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+    }
+
+    public void OnDownloadImg(View view) {
     }
 }

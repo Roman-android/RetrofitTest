@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -113,7 +114,7 @@ public class DownloadFromSQL {
         });
     }
 
-    public void uploadImg(String imagePath){
+    public void uploadImg(String imagePath, final ImageView imageView){
         final ProgressDialog progressDialog;
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Идет загрузка");
@@ -124,7 +125,10 @@ public class DownloadFromSQL {
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"),file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("uploaded_file",file.getName(),requestFile);
 
-        Call <ResponseUpload> resultCall = textApi.uploadImg(body);
+        String descriptionString = "Описание картинки";
+        RequestBody description = RequestBody.create(MediaType.parse("multipart/form-data"),descriptionString);
+
+        Call <ResponseUpload> resultCall = textApi.uploadImg(description,body);
         resultCall.enqueue(new Callback<ResponseUpload>() {
             @Override
             public void onResponse(Call<ResponseUpload> call, Response<ResponseUpload> response) {
@@ -135,6 +139,7 @@ public class DownloadFromSQL {
                     }else {
                         Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                         Log.d(LOG_UPLOAD,"Путь к файлу: "+response.body().getMessage());
+                        imageView.setImageURI(null);
                     }
                 }else {
                     Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();

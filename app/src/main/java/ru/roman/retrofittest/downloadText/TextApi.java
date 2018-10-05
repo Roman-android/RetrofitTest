@@ -3,6 +3,7 @@ package ru.roman.retrofittest.downloadText;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -37,6 +38,7 @@ public interface TextApi {
 
     @Multipart
     @POST("upload.php")
-    Call<ResponseUpload>uploadImg(@Part MultipartBody.Part file);
+    Call<ResponseUpload>uploadImg(@Part ("desc") RequestBody desc,
+                                  @Part MultipartBody.Part file);
 
 }
