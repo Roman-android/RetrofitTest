@@ -2,7 +2,6 @@ package ru.roman.retrofittest;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,6 +18,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.roman.retrofittest.utils.DownloadFromSQL;
@@ -26,7 +26,9 @@ import ru.roman.retrofittest.utils.DownloadFromSQL;
 public class MainActivity extends AppCompatActivity {
 
     DownloadFromSQL downloadFromSQL;
-    ImageView imageView;
+
+    ImageView imageDownload;
+    TextView description;
 
     String imagePath;
 
@@ -52,11 +54,12 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                downloadFromSQL.downloadText();
+                downloadFromSQL.downloadText(imageDownload,description);
             }
         });
 
-        imageView = findViewById(R.id.imageView);
+        imageDownload = findViewById(R.id.imgLoad);
+        description = findViewById(R.id.description);
     }
 
     @Override
@@ -109,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             imageUri = data.getData();
-            imageView.setImageURI(imageUri);
+            imageDownload.setImageURI(imageUri);
             imagePath = getRealPathFromURI(imageUri);
         } else if (resultCode == RESULT_CANCELED && requestCode == 100) {
             Toast.makeText(this, "Вы отменили загрузку изображения((", Toast.LENGTH_SHORT).show();
@@ -137,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     public void OnUploadImg(View view) {
         if (imagePath != null) {
             verifyStoragePermissions(MainActivity.this);
-            downloadFromSQL.uploadImg(imagePath,imageView);
+            downloadFromSQL.uploadImg(imagePath,imageDownload);
         } else {
             Toast.makeText(this, "Пожалуйста сначала выберите изображение!", Toast.LENGTH_SHORT).show();
         }

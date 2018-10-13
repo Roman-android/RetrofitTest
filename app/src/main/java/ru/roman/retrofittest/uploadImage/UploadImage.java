@@ -1,6 +1,6 @@
 package ru.roman.retrofittest.uploadImage;
 
-public class ResponseUpload {
+public class UploadImage {
 
     private String message;
     private Boolean error;
