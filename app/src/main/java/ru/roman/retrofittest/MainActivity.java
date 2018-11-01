@@ -12,25 +12,37 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
+import ru.roman.retrofittest.adapters.RecycleViewAdapter;
+import ru.roman.retrofittest.interfaces.DataFromSQLCallback;
 import ru.roman.retrofittest.utils.DownloadFromSQL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DataFromSQLCallback {
+
+
+    private final String LOG_MAIN = "main_log";
 
     DownloadFromSQL downloadFromSQL;
 
+    RecyclerView recyclerView;
     ImageView imageDownload;
     TextView description;
 
     String imagePath;
+
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -42,19 +54,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         downloadFromSQL = new DownloadFromSQL(this);
+        downloadFromSQL.registerCallback(this);
+        downloadFromSQL.downloadText();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        recyclerView = findViewById(R.id.recycleViewMain);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setItemAnimator(itemAnimator);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                downloadFromSQL.downloadText(imageDownload,description);
+                downloadFromSQL.downloadText();
             }
         });
 
@@ -63,25 +84,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    public void callBackDataFromSQL(ArrayMap<String, String> data, ArrayList<String>img) {
+        Log.d(LOG_MAIN,"size: "+data.size());
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        RecycleViewAdapter adapter = new RecycleViewAdapter(data,img,this);
+        recyclerView.setAdapter(adapter);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void OnPostRequest(View view) {
@@ -104,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        Uri imageUri = null;
+        Uri imageUri;
 
         if (resultCode == RESULT_OK && requestCode == 100) {
             if (data == null) {
@@ -162,4 +170,5 @@ public class MainActivity extends AppCompatActivity {
 
     public void OnDownloadImg(View view) {
     }
+
 }

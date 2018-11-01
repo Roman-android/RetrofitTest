@@ -36,13 +36,13 @@ public interface DownloadApi {
 
     @POST("insert.php")
     @FormUrlEncoded
-    Call<InsertText>saveText(@Field("desc")String desc,
+    Call<InsertText>saveText(@Field("category")String category,
                              @Field("text")String text,
                              @Field("favour")String favour);
 
     @Multipart
     @POST("upload.php")
-    Call<UploadImage>uploadImg(@Part ("desc") RequestBody desc,
+    Call<UploadImage>uploadImg(@Part ("category") RequestBody category,
                                @Part MultipartBody.Part file);
 
 }

@@ -3,18 +3,14 @@ package ru.roman.retrofittest.utils;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -25,6 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.roman.retrofittest.downloadText.DownloadText;
 import ru.roman.retrofittest.insertText.InsertText;
+import ru.roman.retrofittest.interfaces.DataFromSQLCallback;
 import ru.roman.retrofittest.uploadImage.UploadImage;
 
 public class DownloadFromSQL {
@@ -39,9 +36,16 @@ public class DownloadFromSQL {
     private final String LOG_POST = "main_insert";
     private final String LOG_UPLOAD = "main_upload";
 
+
     private DownloadApi downloadApi = DownloadApi.retrofit.create(DownloadApi.class);
 
-    public void downloadText(final ImageView imageView, final TextView desc) {
+    private DataFromSQLCallback dataFromSQLCallback;
+
+    public void registerCallback(DataFromSQLCallback dataFromSQLCallback) {
+        this.dataFromSQLCallback = dataFromSQLCallback;
+    }
+
+    public void downloadText() {
         /*
         Map<String, String> data = new HashMap<>();
         //data.put("fav","1");
@@ -50,29 +54,45 @@ public class DownloadFromSQL {
         Call<List<DownloadText>> text = downloadApi.text(data);
 */
 
-        Call<List<DownloadText>> text = downloadApi.text("111","0");
+        Call<List<DownloadText>> text = downloadApi.text(null, "0");
 
         text.enqueue(new Callback<List<DownloadText>>() {
             @Override
             public void onResponse(@NonNull Call<List<DownloadText>> call, @NonNull Response<List<DownloadText>> response) {
+
+                ArrayMap<String, String> idAndCategoryArray = new ArrayMap<>();
+                ArrayList<String> imgArray = new ArrayList();
+
                 for (int i = 0; i < response.body().size(); i++) {
-                    Log.d(LOG_DOWNLOAD, "response: Столбик TEXT: " + response.body().get(i).getDesc() + "; Столбик DESC: " + response.body().get(i).getImg_name());
-                    Glide
+                    String idToArray = response.body().get(i).getId();
+                    String descToArray = response.body().get(i).getCategory();
+
+                    String imgToArray = response.body().get(i).getImg_name();
+
+                    idAndCategoryArray.put(idToArray, descToArray);
+                    imgArray.add(imgToArray);
+                    //Log.d(LOG_DOWNLOAD, "key: " + idAndCategoryArray.keyAt(i));
+                    //Log.d(LOG_DOWNLOAD, "value: " + idAndCategoryArray.valueAt(i));
+
+/*                    Glide
                             .with(context)
                             .load(response.body().get(i).getImg_name())
                             .apply(new RequestOptions()
-                            .override(400,400)
-                            .centerCrop())
-                            .into(imageView);
-                    desc.setText(response.body().get(i).getDesc());
+                                    .override(400, 400)
+                                    .centerCrop())
+                            .into(imageView);*/
+                    //desc.setText(response.body().get(i).getCategory());
                 }
+                dataFromSQLCallback.callBackDataFromSQL(idAndCategoryArray,imgArray);
             }
 
             @Override
             public void onFailure(@NonNull Call<List<DownloadText>> call, @NonNull Throwable t) {
                 Log.d(LOG_DOWNLOAD, "failure " + t);
             }
+
         });
+
     }
 
     public void postRequest() {
@@ -109,10 +129,10 @@ public class DownloadFromSQL {
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("uploaded_file", file.getName(), requestFile);
 
-        String descriptionString = "Описание картинки";
-        RequestBody description = RequestBody.create(MediaType.parse("multipart/form-data"), descriptionString);
+        String categoryString = "Описание картинки";
+        RequestBody category = RequestBody.create(MediaType.parse("multipart/form-data"), categoryString);
 
-        Call<UploadImage> resultCall = downloadApi.uploadImg(description, body);
+        Call<UploadImage> resultCall = downloadApi.uploadImg(category, body);
         resultCall.enqueue(new Callback<UploadImage>() {
             @Override
             public void onResponse(Call<UploadImage> call, Response<UploadImage> response) {
