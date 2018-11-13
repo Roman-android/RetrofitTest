@@ -22,12 +22,6 @@ import ru.roman.retrofittest.uploadImage.UploadImage;
 
 public interface DownloadApi {
 
-    String baseText = "http://u47689.netangels.ru/";
-    Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(baseText)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-
     @GET("test_get_all_json.php")
     Call<List<DownloadText>> text(@Query("id") String id,
                                   @Query("fav") String isFavour);

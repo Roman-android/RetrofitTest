@@ -8,13 +8,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -40,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
     RecyclerView recyclerView;
     ImageView imageDownload;
     TextView description;
+
+    DividerItemDecoration dividerItemDecoration;
 
     String imagePath;
 
@@ -67,17 +68,8 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setItemAnimator(itemAnimator);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-                downloadFromSQL.downloadText();
-            }
-        });
+        dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         imageDownload = findViewById(R.id.imgLoad);
         description = findViewById(R.id.description);
@@ -87,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
     public void callBackDataFromSQL(ArrayMap<String, String> data, ArrayList<String>img) {
         Log.d(LOG_MAIN,"size: "+data.size());
 
-        RecycleViewAdapter adapter = new RecycleViewAdapter(data,img,this);
+        RecycleViewAdapter adapter = new RecycleViewAdapter(data, img, this);
         recyclerView.setAdapter(adapter);
 
     }

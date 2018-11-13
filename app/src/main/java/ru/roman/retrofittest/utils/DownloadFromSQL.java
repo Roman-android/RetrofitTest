@@ -37,7 +37,8 @@ public class DownloadFromSQL {
     private final String LOG_UPLOAD = "main_upload";
 
 
-    private DownloadApi downloadApi = DownloadApi.retrofit.create(DownloadApi.class);
+    private DownloadApi downloadApi = RetrofitClient.getRetrofitApi().create(DownloadApi.class);
+
 
     private DataFromSQLCallback dataFromSQLCallback;
 
@@ -71,17 +72,6 @@ public class DownloadFromSQL {
 
                     idAndCategoryArray.put(idToArray, descToArray);
                     imgArray.add(imgToArray);
-                    //Log.d(LOG_DOWNLOAD, "key: " + idAndCategoryArray.keyAt(i));
-                    //Log.d(LOG_DOWNLOAD, "value: " + idAndCategoryArray.valueAt(i));
-
-/*                    Glide
-                            .with(context)
-                            .load(response.body().get(i).getImg_name())
-                            .apply(new RequestOptions()
-                                    .override(400, 400)
-                                    .centerCrop())
-                            .into(imageView);*/
-                    //desc.setText(response.body().get(i).getCategory());
                 }
                 dataFromSQLCallback.callBackDataFromSQL(idAndCategoryArray,imgArray);
             }

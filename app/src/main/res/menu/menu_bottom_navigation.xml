@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ru.roman.retrofittest.MainActivity">
+    <item
+        android:id="@+id/item_1"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="Добавить" />
+    <item
+        android:id="@+id/item_2"
+        android:icon="@android:drawable/ic_lock_lock"
+        android:title="Редактировать" />
+    <item
+        android:id="@+id/item_3"
+        android:icon="@android:drawable/ic_dialog_email"
+        android:title="Удалить" />
+</menu>
