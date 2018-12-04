@@ -62,18 +62,38 @@ public class DownloadFromSQL {
             public void onResponse(@NonNull Call<List<DownloadText>> call, @NonNull Response<List<DownloadText>> response) {
 
                 ArrayMap<String, String> idAndCategoryArray = new ArrayMap<>();
-                ArrayList<String> imgArray = new ArrayList();
+                ArrayList <String> idArray = new ArrayList<>();
+                ArrayList <String> categoryArray = new ArrayList<>();
+                ArrayList <String> textArray = new ArrayList<>();
+                ArrayList <String> favourArray = new ArrayList<>();
+                ArrayList <String> imgArray = new ArrayList<>();
 
-                for (int i = 0; i < response.body().size(); i++) {
-                    String idToArray = response.body().get(i).getId();
-                    String descToArray = response.body().get(i).getCategory();
+                ArrayList<ArrayList<String>> dataFromSQL = new ArrayList<>();
 
-                    String imgToArray = response.body().get(i).getImg_name();
+                if (response.body() != null) {
+                    for (int i = 0; i < response.body().size(); i++) {
 
-                    idAndCategoryArray.put(idToArray, descToArray);
-                    imgArray.add(imgToArray);
+                        String idToArray = response.body().get(i).getId();
+                        String categoryToArray = response.body().get(i).getCategory();
+                        String textToArray = response.body().get(i).getText();
+                        String favourToArray = response.body().get(i).getFavour();
+                        String imgToArray = response.body().get(i).getImg_name();
+
+                        idAndCategoryArray.put(idToArray, categoryToArray);
+
+                        idArray.add(idToArray);
+                        categoryArray.add(categoryToArray);
+                        textArray.add(textToArray);
+                        favourArray.add(favourToArray);
+                        imgArray.add(imgToArray);
+                    }
+                    dataFromSQL.add(idArray);
+                    dataFromSQL.add(categoryArray);
+                    dataFromSQL.add(textArray);
+                    dataFromSQL.add(favourArray);
+                    dataFromSQL.add(imgArray);
+                    dataFromSQLCallback.callBackDataFromSQL(dataFromSQL);
                 }
-                dataFromSQLCallback.callBackDataFromSQL(idAndCategoryArray,imgArray);
             }
 
             @Override

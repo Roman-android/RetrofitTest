@@ -2,22 +2,20 @@ package ru.roman.retrofittest;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.CursorLoader;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,7 +23,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import ru.roman.retrofittest.adapters.RecycleViewAdapter;
+import ru.roman.retrofittest.fragments.EditFragment;
+import ru.roman.retrofittest.fragments.EditViewModel;
+import ru.roman.retrofittest.fragments.RecycleFragment;
 import ru.roman.retrofittest.interfaces.DataFromSQLCallback;
 import ru.roman.retrofittest.utils.DownloadFromSQL;
 
@@ -36,13 +36,13 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
 
     DownloadFromSQL downloadFromSQL;
 
-    RecyclerView recyclerView;
     ImageView imageDownload;
     TextView description;
-
-    DividerItemDecoration dividerItemDecoration;
-
     String imagePath;
+    FragmentManager fragmentManager;
+    EditViewModel mViewModel;
+
+    EditFragment editFragment;
 
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -62,32 +62,27 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
         downloadFromSQL.registerCallback(this);
         downloadFromSQL.downloadText();
 
-        recyclerView = findViewById(R.id.recycleViewMain);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setItemAnimator(itemAnimator);
+        fragmentManager = getSupportFragmentManager();
 
-        dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),linearLayoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
+        editFragment = new EditFragment();
 
-        imageDownload = findViewById(R.id.imgLoad);
-        description = findViewById(R.id.description);
     }
 
     @Override
-    public void callBackDataFromSQL(ArrayMap<String, String> data, ArrayList<String>img) {
-        Log.d(LOG_MAIN,"size: "+data.size());
-
-        RecycleViewAdapter adapter = new RecycleViewAdapter(data, img, this);
-        recyclerView.setAdapter(adapter);
-
+    public void callBackDataFromSQL(final ArrayList<ArrayList<String>> dataFromSQL) {
+// TODO: 17.11.2018  Здесь подключаем фрагмент
+        RecycleFragment recycleFragment = RecycleFragment.newInstance(dataFromSQL);
+        fragmentManager.beginTransaction()
+                .add(R.id.container,recycleFragment)
+                .commit();
     }
 
     public void OnPostRequest(View view) {
         downloadFromSQL.postRequest();
     }
 
+
+    // TODO: 17.11.2018 Методы для выбора и загрузки изображения из галлереи на сервер в БД
     public void OnPickImg(View view) {
         showImage();
     }
@@ -118,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
             Toast.makeText(this, "Вы отменили загрузку изображения((", Toast.LENGTH_SHORT).show();
         }
 
-
     }
 
     private String getRealPathFromURI(Uri contentUri) {
@@ -140,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
     public void OnUploadImg(View view) {
         if (imagePath != null) {
             verifyStoragePermissions(MainActivity.this);
-            downloadFromSQL.uploadImg(imagePath,imageDownload);
+            downloadFromSQL.uploadImg(imagePath, imageDownload);
         } else {
             Toast.makeText(this, "Пожалуйста сначала выберите изображение!", Toast.LENGTH_SHORT).show();
         }
@@ -159,8 +153,4 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
             );
         }
     }
-
-    public void OnDownloadImg(View view) {
-    }
-
 }
