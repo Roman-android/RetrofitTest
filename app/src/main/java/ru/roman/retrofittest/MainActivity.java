@@ -16,33 +16,40 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
-import ru.roman.retrofittest.fragments.EditFragment;
-import ru.roman.retrofittest.fragments.EditViewModel;
+import ru.roman.retrofittest.fragments.AddEditFragment;
+import ru.roman.retrofittest.fragments.InfoFragment;
+import ru.roman.retrofittest.viewModels.ViewModels;
 import ru.roman.retrofittest.fragments.RecycleFragment;
-import ru.roman.retrofittest.interfaces.DataFromSQLCallback;
 import ru.roman.retrofittest.utils.DownloadFromSQL;
 
-public class MainActivity extends AppCompatActivity implements DataFromSQLCallback {
+public class MainActivity extends AppCompatActivity {
 
 
     private final String LOG_MAIN = "main_log";
 
     DownloadFromSQL downloadFromSQL;
 
+    public Toolbar toolbar;
+    Spinner spinnerFav;
     ImageView imageDownload;
     TextView description;
+
     String imagePath;
     FragmentManager fragmentManager;
-    EditViewModel mViewModel;
+    public ViewModels mViewModel;
 
-    EditFragment editFragment;
+    RecycleFragment recycleFragment;
+    AddEditFragment addEditFragment;
+    InfoFragment infoFragment;
 
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -55,25 +62,106 @@ public class MainActivity extends AppCompatActivity implements DataFromSQLCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        Log.d(LOG_MAIN, "onCreate");
+
+        toolbar = findViewById(R.id.toolbar);
+        spinnerFav = findViewById(R.id.spinnerFavorite);
         setSupportActionBar(toolbar);
 
         downloadFromSQL = new DownloadFromSQL(this);
-        downloadFromSQL.registerCallback(this);
-        downloadFromSQL.downloadText();
 
         fragmentManager = getSupportFragmentManager();
 
-        editFragment = new EditFragment();
+        recycleFragment = new RecycleFragment();
+        addEditFragment = new AddEditFragment();
+        infoFragment = new InfoFragment();
+
+
+
+
+        mViewModel = ViewModelProviders.of(this).get(ViewModels.class);
+        /*String getSwitchFragment = mViewModel.getSwitchFragment().getValue();
+        if (getSwitchFragment == null){
+            Log.d(LOG_MAIN,"mViewModel.getSwitchFragment() = null");
+            addFragment();
+        }else {
+            Log.d(LOG_MAIN,"mViewModel.getSwitchFragment() = "+ getSwitchFragment);
+        }*/
+        addFragment();
+        mViewModel.getSwitchFragment().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                if (s != null) {
+                    spinnerFav.setVisibility(View.GONE);
+                    switch (s) {
+                        case "InfoFragment":
+                            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+                            fragmentManager.beginTransaction()
+                                    .replace(R.id.container, infoFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+
+                            setUpButton(true);
+                            break;
+                        case "AddFragment":
+                            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+                            fragmentManager.beginTransaction()
+                                    .replace(R.id.container, addEditFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+
+                            setUpButton(true);
+                            break;
+                        case "EditFragment":
+                            fragmentManager.beginTransaction()
+                                    .replace(R.id.container, addEditFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+
+                            setUpButton(true);
+                            break;
+                        default:
+                            Log.d(LOG_MAIN, "Значение не опеделено");
+                            break;
+                    }
+                    Log.d(LOG_MAIN, s);
+                    //mViewModel.setSwitchFragment(null);
+                    toolbar.setTitle(s);
+                }
+
+            }
+        });
 
     }
 
+    private void setUpButton(Boolean b) {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setHomeButtonEnabled(b);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(b);
+            getSupportActionBar().setDisplayShowHomeEnabled(b);
+        }
+    }
+
     @Override
-    public void callBackDataFromSQL(final ArrayList<ArrayList<String>> dataFromSQL) {
-// TODO: 17.11.2018  Здесь подключаем фрагмент
-        RecycleFragment recycleFragment = RecycleFragment.newInstance(dataFromSQL);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            fragmentManager.popBackStack();
+            setUpButton(false);
+            return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void addFragment() {
         fragmentManager.beginTransaction()
-                .add(R.id.container,recycleFragment)
+                .replace(R.id.container, recycleFragment)
                 .commit();
     }
 

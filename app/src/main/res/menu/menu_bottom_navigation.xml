@@ -3,15 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="ru.roman.retrofittest.MainActivity">
     <item
-        android:id="@+id/item_1"
+        android:id="@+id/add"
         android:icon="@android:drawable/btn_star_big_on"
-        android:title="Добавить" />
+        android:title="@string/add_item" />
     <item
-        android:id="@+id/item_2"
+        android:id="@+id/edit"
+        android:enabled="false"
         android:icon="@android:drawable/ic_lock_lock"
-        android:title="Редактировать" />
+        android:title="@string/edit_item" />
     <item
-        android:id="@+id/item_3"
+        android:id="@+id/delete"
+        android:enabled="false"
         android:icon="@android:drawable/ic_dialog_email"
-        android:title="Удалить" />
+        android:title="@string/delete_item" />
 </menu>

@@ -44,13 +44,21 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item, parent, false);
 
         final ViewHolder mViewHolder = new ViewHolder(view);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onItemClick(view, mViewHolder.getAdapterPosition());
+                listener.onClick(view, mViewHolder.getAdapterPosition());
+            }
+        });
+
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                listener.onLongClick(view,mViewHolder.getAdapterPosition());
+                return true;
             }
         });
 

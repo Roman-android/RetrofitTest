@@ -7,6 +7,7 @@ public class DownloadText {
     private String text;
     private String favour;
     private String img_name;
+    private String message;
 
 
     public String getImg_name() {
@@ -23,6 +24,10 @@ public class DownloadText {
     }
     public String getFavour() {
         return favour;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
 }

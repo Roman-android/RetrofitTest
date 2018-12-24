@@ -1,9 +1,9 @@
 package ru.roman.retrofittest.utils;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -21,7 +21,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.roman.retrofittest.downloadText.DownloadText;
 import ru.roman.retrofittest.insertText.InsertText;
-import ru.roman.retrofittest.interfaces.DataFromSQLCallback;
 import ru.roman.retrofittest.uploadImage.UploadImage;
 
 public class DownloadFromSQL {
@@ -36,17 +35,12 @@ public class DownloadFromSQL {
     private final String LOG_POST = "main_insert";
     private final String LOG_UPLOAD = "main_upload";
 
+    private ArrayList<ArrayList<String>> dataFromSQL = new ArrayList<>();
 
     private DownloadApi downloadApi = RetrofitClient.getRetrofitApi().create(DownloadApi.class);
+    private MutableLiveData<ArrayList<ArrayList<String>>> loadData = new MutableLiveData<>();
 
-
-    private DataFromSQLCallback dataFromSQLCallback;
-
-    public void registerCallback(DataFromSQLCallback dataFromSQLCallback) {
-        this.dataFromSQLCallback = dataFromSQLCallback;
-    }
-
-    public void downloadText() {
+    public MutableLiveData<ArrayList<ArrayList<String>>> downloadText(String id, String isFavour, final String nameFragment) {
         /*
         Map<String, String> data = new HashMap<>();
         //data.put("fav","1");
@@ -55,23 +49,24 @@ public class DownloadFromSQL {
         Call<List<DownloadText>> text = downloadApi.text(data);
 */
 
-        Call<List<DownloadText>> text = downloadApi.text(null, "0");
+        Call<List<DownloadText>> text = downloadApi.text(id, isFavour);
 
         text.enqueue(new Callback<List<DownloadText>>() {
             @Override
             public void onResponse(@NonNull Call<List<DownloadText>> call, @NonNull Response<List<DownloadText>> response) {
 
-                ArrayMap<String, String> idAndCategoryArray = new ArrayMap<>();
-                ArrayList <String> idArray = new ArrayList<>();
-                ArrayList <String> categoryArray = new ArrayList<>();
-                ArrayList <String> textArray = new ArrayList<>();
-                ArrayList <String> favourArray = new ArrayList<>();
-                ArrayList <String> imgArray = new ArrayList<>();
-
-                ArrayList<ArrayList<String>> dataFromSQL = new ArrayList<>();
+                ArrayList<String> idArray = new ArrayList<>();
+                ArrayList<String> categoryArray = new ArrayList<>();
+                ArrayList<String> textArray = new ArrayList<>();
+                ArrayList<String> favourArray = new ArrayList<>();
+                ArrayList<String> imgArray = new ArrayList<>();
 
                 if (response.body() != null) {
+                    if (!dataFromSQL.isEmpty()) {
+                        dataFromSQL.clear();
+                    }
                     for (int i = 0; i < response.body().size(); i++) {
+
 
                         String idToArray = response.body().get(i).getId();
                         String categoryToArray = response.body().get(i).getCategory();
@@ -79,20 +74,21 @@ public class DownloadFromSQL {
                         String favourToArray = response.body().get(i).getFavour();
                         String imgToArray = response.body().get(i).getImg_name();
 
-                        idAndCategoryArray.put(idToArray, categoryToArray);
-
                         idArray.add(idToArray);
                         categoryArray.add(categoryToArray);
                         textArray.add(textToArray);
                         favourArray.add(favourToArray);
                         imgArray.add(imgToArray);
                     }
+                    ArrayList<String> fragment = new ArrayList<>();
+                    fragment.add(nameFragment);
                     dataFromSQL.add(idArray);
                     dataFromSQL.add(categoryArray);
                     dataFromSQL.add(textArray);
                     dataFromSQL.add(favourArray);
                     dataFromSQL.add(imgArray);
-                    dataFromSQLCallback.callBackDataFromSQL(dataFromSQL);
+                    dataFromSQL.add(fragment);
+                    loadData.setValue(dataFromSQL);
                 }
             }
 
@@ -102,7 +98,8 @@ public class DownloadFromSQL {
             }
 
         });
-
+        Log.d(LOG_DOWNLOAD, "Сработал downloadText()");
+        return loadData;
     }
 
     public void postRequest() {
