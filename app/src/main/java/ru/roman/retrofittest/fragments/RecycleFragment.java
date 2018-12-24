@@ -111,8 +111,10 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mViewModel.setDataFromSQL(null);
-                dataFromSQL.clear();
+                if (position != 0) {
+                    mViewModel.setDataFromSQL(null);
+                    dataFromSQL.clear();
+                }
                 switch (position) {
                     case 1:
                         mViewModel.setId(null);
@@ -211,7 +213,12 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
                 isLongClick = true;
                 positionItem = position;
                 Toast.makeText(getActivity(), "OnLongClick: position: " + position, Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(), "OnLongClick: position: " + dataFromSQL.get(0).get(position), Toast.LENGTH_SHORT).show();
+
+                if (!dataFromSQL.isEmpty()) {
+                    Toast.makeText(getActivity(), "OnLongClick: position: " + dataFromSQL.get(0).get(position), Toast.LENGTH_SHORT).show();
+                } else if (dataFromSQL.isEmpty()){
+                    Log.d(LOG_RECYCLE_FRAGMENT, "OnLongClick: dataFromSQL.get(0).isEmpty(((");
+                }
 
                 view.setBackgroundColor(getResources().getColor(R.color.colorOnLongClick));
 
