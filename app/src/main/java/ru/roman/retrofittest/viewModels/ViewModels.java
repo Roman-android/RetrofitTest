@@ -6,8 +6,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-
 import ru.roman.retrofittest.model.DataModel;
 import ru.roman.retrofittest.utils.DownloadFromSQL;
 
@@ -30,9 +28,8 @@ public class ViewModels extends AndroidViewModel {
     }
 
     // TODO: 04.12.2018 Загрузка данных из Retrofit
-    //private LiveData<ArrayList<ArrayList<String>>> dataFromSQL;
     private String id;
-    private String isFlavour;
+    private String isFavour;
     private String nameFragment;
 
     public String getId() {
@@ -43,12 +40,12 @@ public class ViewModels extends AndroidViewModel {
         this.id = id;
     }
 
-    public String getIsFlavour() {
-        return isFlavour;
+    public String getIsFavour() {
+        return isFavour;
     }
 
-    public void setIsFlavour(String isFlavour) {
-        this.isFlavour = isFlavour;
+    public void setIsFavour(String isFavour) {
+        this.isFavour = isFavour;
     }
 
     public String getNameFragment() {
@@ -62,11 +59,13 @@ public class ViewModels extends AndroidViewModel {
     private LiveData<DataModel> liveDataModel;
 
     public void clearLiveDataModel() {
-        liveDataModel = null;
+        if (liveDataModel != null) {
+            liveDataModel = null;
+        }
     }
     public LiveData<DataModel> getLiveDataModel() {
         if (liveDataModel == null) {
-            liveDataModel = downloadFromSQL.downloadText(getId(), getIsFlavour(), getNameFragment());
+            liveDataModel = downloadFromSQL.downloadText(getId(), getIsFavour(), getNameFragment());
         }
         return liveDataModel;
     }

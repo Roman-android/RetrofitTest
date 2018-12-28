@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
                             setUpButton(true);
                             break;
-                        case "EditFragment":
+                        case "Edit fragment":
                             fragmentManager.beginTransaction()
                                     .replace(R.id.container, addEditFragment)
                                     .addToBackStack(null)

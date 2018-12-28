@@ -31,9 +31,9 @@ public class DownloadFromSQL {
         this.context = context;
     }
 
-    private final String LOG_DOWNLOAD = "main_download";
-    private final String LOG_POST = "main_insert";
-    private final String LOG_UPLOAD = "main_upload";
+    private final String LOG_DOWNLOAD = "log_download";
+    private final String LOG_POST = "log_insert";
+    private final String LOG_UPLOAD = "log_upload";
 
     private DownloadApi downloadApi = RetrofitClient.getRetrofitApi().create(DownloadApi.class);
 
