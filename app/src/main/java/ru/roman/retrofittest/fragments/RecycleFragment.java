@@ -1,6 +1,5 @@
 package ru.roman.retrofittest.fragments;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import ru.roman.retrofittest.R;
 import ru.roman.retrofittest.adapters.RecycleViewAdapter;
 import ru.roman.retrofittest.interfaces.OnItemClickListener;
+import ru.roman.retrofittest.model.DataModel;
 import ru.roman.retrofittest.viewModels.ViewModels;
 
 public class RecycleFragment extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -38,98 +38,123 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
 
     RecyclerView recyclerView;
     RecycleViewAdapter adapter;
-    int positionItem;
+    DividerItemDecoration dividerItemDecoration;
 
     Spinner spinner;
-    String positionSpinner;
 
     BottomNavigationView bottomNavigationView;
     MenuItem editItemNavigation;
     MenuItem deleteItemNavigation;
 
-    DividerItemDecoration dividerItemDecoration;
-    private ArrayList<ArrayList<String>> dataFromSQL = new ArrayList<>();
+    int positionItem;
+    ArrayList<Integer> selectedItem = new ArrayList<>();
+
+    private DataModel liveDataModel;
     private ViewModels mViewModel;
     private Boolean isLongClick = false;
-    ArrayList<Integer> selectedItem = new ArrayList<>();
+
     private final String LOG_RECYCLE_FRAGMENT = "recycle_fragment";
 
-    View checkedItems;
-    View view;
+    // TODO: 25.12.2018 fields for get data from DataModel class
+    //region Fields for get data from DataModel class
+    private ArrayList<String> getId = new ArrayList<>();
+    private ArrayList<String> getCategory = new ArrayList<>();
+    private ArrayList<String> getText = new ArrayList<>();
+    private ArrayList<String> getFavour = new ArrayList<>();
+    private ArrayList<String> getImg = new ArrayList<>();
+    private String getFragmentName;
+    //endregion
 
-    @SuppressLint("LogNotTimber")
+    View checkedItems;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_RECYCLE_FRAGMENT, "onCreate");
-
         mViewModel = ViewModelProviders.of(getActivity()).get(ViewModels.class);
-
         setHasOptionsMenu(true);
-
     }
 
-    final Observer<ArrayList<ArrayList<String>>> recycleObserver = new Observer<ArrayList<ArrayList<String>>>() {
+ /*   final Observer<ArrayList<ArrayList<String>>> recycleObserver = new Observer<ArrayList<ArrayList<String>>>() {
         @Override
         public void onChanged(@Nullable ArrayList<ArrayList<String>> arrayLists) {
-            dataFromSQL = arrayLists;
-            if (dataFromSQL != null && dataFromSQL.get(5).get(0).equals("RecycleFragment")) {
-                Log.d(LOG_RECYCLE_FRAGMENT, "1. Сработал recycleObserver: dataFromSQL size: " + dataFromSQL.get(0).size());
+            liveDataModel = arrayLists;
+            if (liveDataModel != null && liveDataModel.get(5).get(0).equals("RecycleFragment")) {
+                Log.d(LOG_RECYCLE_FRAGMENT, "1. Сработал recycleObserver: liveDataModel size: " + liveDataModel.get(0).size());
                 Log.d(LOG_RECYCLE_FRAGMENT, "2. Сработал recycleObserver: getId = " + mViewModel.getId());
                 Log.d(LOG_RECYCLE_FRAGMENT, "3.Сработал recycleObserver: getIsFlavour = " + mViewModel.getIsFlavour());
                 initRecyclerView(view);
             }
         }
-    };
+    };*/
+
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(LOG_RECYCLE_FRAGMENT, "onCreateView");
 
-        view = inflater.inflate(R.layout.recycle_fragment_layout, container, false);
+        final View view = inflater.inflate(R.layout.recycle_fragment_layout, container, false);
         toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle("Recycle fragment");
 
         mViewModel.setId(null);
-        mViewModel.setIsFlavour("1");
+        mViewModel.setIsFlavour("0");
         mViewModel.setNameFragment("RecycleFragment");
-        mViewModel.getDataFromSQL().observe(this, recycleObserver);
+        mViewModel.getLiveDataModel().observe(this, new Observer<DataModel>() {
+            @Override
+            public void onChanged(@Nullable DataModel dataModel) {
+                liveDataModel = dataModel;
+                if (dataModel != null) {
+                    getId = dataModel.getId();
+                    getCategory = dataModel.getCategory();
+                    getText = dataModel.getText();
+                    getFavour = dataModel.getFavour();
+                    getImg = dataModel.getImg();
+                    getFavour = dataModel.getFavour();
+                    getFragmentName = dataModel.getFragmentName();
+                }
+
+                if (getFragmentName.equals("RecycleFragment")) {
+                    Log.d(LOG_RECYCLE_FRAGMENT, "1. getFragmentName: " + getFragmentName);
+                    Log.d(LOG_RECYCLE_FRAGMENT, "2. Сработал recycleObserver: liveDataModel size: " + getId.size());
+                    Log.d(LOG_RECYCLE_FRAGMENT, "3. Сработал recycleObserver: getId = " + mViewModel.getId());
+                    Log.d(LOG_RECYCLE_FRAGMENT, "4.Сработал recycleObserver: getIsFlavour = " + mViewModel.getIsFlavour());
+                    initRecyclerView(view);
+                }
+            }
+        });
         //Log.d(LOG_RECYCLE_FRAGMENT, "fragment name: " + mViewModel.getDataFromSQL().getValue().get(5).get(0));
 
         Log.d(LOG_RECYCLE_FRAGMENT, "onCreateView mViewModel.getId() = " + mViewModel.getId());
         Log.d(LOG_RECYCLE_FRAGMENT, "onCreateView mViewModel.getIsFlavour = " + mViewModel.getIsFlavour());
-        if(dataFromSQL == null){
-            Log.d(LOG_RECYCLE_FRAGMENT, "1. mViewModel.getDataFromSQL() = null");
-        }else {
-            Log.d(LOG_RECYCLE_FRAGMENT, "2. mViewModel.getDataFromSQL() != null ");
-        }
 
         spinner = getActivity().findViewById(R.id.spinnerFavorite);
         spinner.setVisibility(View.VISIBLE);
         //region Spinner
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        /*spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position != 0) {
                     mViewModel.setDataFromSQL(null);
-                    dataFromSQL.clear();
+                    liveDataModel = null;
                 }
                 switch (position) {
                     case 1:
                         mViewModel.setId(null);
                         mViewModel.setIsFlavour(null);
-                        mViewModel.getDataFromSQL();
+                        mViewModel.getLiveDataModel();
                         break;
                     case 2:
                         mViewModel.setId(null);
                         mViewModel.setIsFlavour("0");
-                        mViewModel.getDataFromSQL();
+                        mViewModel.getLiveDataModel();
                         break;
                     case 3:
                         mViewModel.setId(null);
                         mViewModel.setIsFlavour("1");
-                        mViewModel.getDataFromSQL();
+                        mViewModel.getLiveDataModel();
                         break;
                 }
                 if (position != 0){
@@ -142,7 +167,7 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
-        });
+        });*/
         //endregion
 
         bottomNavigationView = view.findViewById(R.id.bottom_navigation);
@@ -175,8 +200,8 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
         Log.d(LOG_RECYCLE_FRAGMENT, "onResume");
         Log.d(LOG_RECYCLE_FRAGMENT, "1. onResume mViewModel.getId = " + mViewModel.getId());
         Log.d(LOG_RECYCLE_FRAGMENT, "2. onResume mViewModel.getIsFlavour = " + mViewModel.getIsFlavour());
-        /*if (dataFromSQL.size()>0) {
-            dataFromSQL.clear();
+        /*if (liveDataModel.size()>0) {
+            liveDataModel.clear();
         }
         adapter.notifyDataSetChanged();*/
     }
@@ -191,7 +216,7 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
         dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        adapter = new RecycleViewAdapter(dataFromSQL, getActivity(), new OnItemClickListener() {
+        adapter = new RecycleViewAdapter(liveDataModel, getActivity(), new OnItemClickListener() {
             @Override
             public void onClick(View view, int position) {
                 positionItem = position;
@@ -203,7 +228,7 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
                     }
                 } else {
                     Toast.makeText(getActivity(), "OnClick: position: " + positionItem, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "OnClick: arrays: " + dataFromSQL.get(0).get(positionItem), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "OnClick: arrays: " + getId.get(positionItem), Toast.LENGTH_SHORT).show();
                     mViewModel.setSwitchFragment("InfoFragment");
                 }
             }
@@ -214,10 +239,10 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
                 positionItem = position;
                 Toast.makeText(getActivity(), "OnLongClick: position: " + position, Toast.LENGTH_SHORT).show();
 
-                if (!dataFromSQL.isEmpty()) {
-                    Toast.makeText(getActivity(), "OnLongClick: position: " + dataFromSQL.get(0).get(position), Toast.LENGTH_SHORT).show();
-                } else if (dataFromSQL.isEmpty()){
-                    Log.d(LOG_RECYCLE_FRAGMENT, "OnLongClick: dataFromSQL.get(0).isEmpty(((");
+                if (liveDataModel != null) {
+                    Toast.makeText(getActivity(), "OnLongClick: position: " + getId.get(position), Toast.LENGTH_SHORT).show();
+                } else if (liveDataModel == null){
+                    Log.d(LOG_RECYCLE_FRAGMENT, "OnLongClick: liveDataModel.get(0).isEmpty(((");
                 }
 
                 view.setBackgroundColor(getResources().getColor(R.color.colorOnLongClick));
@@ -236,7 +261,7 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
             }
         });
         recyclerView.setAdapter(adapter);
-        Log.d(LOG_RECYCLE_FRAGMENT, "init recyclerview");
+        Log.d(LOG_RECYCLE_FRAGMENT, "init recyclerView");
     }
 
     @Override
@@ -275,9 +300,9 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
             case R.id.edit:
                 Toast.makeText(getActivity(), "Нажата кнопка Edit", Toast.LENGTH_SHORT).show();
                 mViewModel.setSwitchFragment("EditFragment");
-                mViewModel.setId(dataFromSQL.get(0).get(positionItem));
-                mViewModel.getDataFromSQL().removeObserver(recycleObserver);
-                mViewModel.setDataFromSQL(null);
+                mViewModel.setId(getId.get(positionItem));
+                //mViewModel.getDataFromSQL().removeObserver(recycleObserver);
+                mViewModel.clearLiveDataModel();
                 break;
             case R.id.delete:
                 Toast.makeText(getActivity(), "Нажата кнопка Delete", Toast.LENGTH_SHORT).show();

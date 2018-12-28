@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import ru.roman.retrofittest.R;
 import ru.roman.retrofittest.interfaces.OnItemClickListener;
+import ru.roman.retrofittest.model.DataModel;
 
 
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder> {
@@ -31,12 +32,12 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
 
     private Context context;
 
-    public RecycleViewAdapter(ArrayList<ArrayList<String>> dataFromSQL, Context context, OnItemClickListener listener) {
-        this.mId = dataFromSQL.get(0);
-        this.mCategory = dataFromSQL.get(1);
-        this.mText = dataFromSQL.get(2);
-        this.mFavour = dataFromSQL.get(3);
-        this.mImgPath = dataFromSQL.get(4);
+    public RecycleViewAdapter(DataModel dataModel, Context context, OnItemClickListener listener) {
+        this.mId = dataModel.getId();
+        this.mCategory = dataModel.getCategory();
+        this.mText = dataModel.getText();
+        this.mFavour = dataModel.getFavour();
+        this.mImgPath = dataModel.getImg();
         this.context = context;
         this.listener = listener;
     }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import ru.roman.retrofittest.R;
+import ru.roman.retrofittest.model.DataModel;
 import ru.roman.retrofittest.viewModels.ViewModels;
 
 public class AddEditFragment extends Fragment {
@@ -40,7 +42,18 @@ public class AddEditFragment extends Fragment {
     Button btn_update;
     private ArrayList<ArrayList<String>> dataFromSQL = new ArrayList<>();
 
+    DataModel liveDataModel;
     private String nameFragment;
+
+    // TODO: 25.12.2018 fields for get data from DataModel class
+    //region Fields for get data from DataModel class
+    private ArrayList<String> getId = new ArrayList<>();
+    private ArrayList<String> getCategory = new ArrayList<>();
+    private ArrayList<String> getText = new ArrayList<>();
+    private ArrayList<String> getFavour = new ArrayList<>();
+    private ArrayList<String> getImg = new ArrayList<>();
+    private String getFragmentName;
+    //endregion
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,34 +74,49 @@ public class AddEditFragment extends Fragment {
         btn_save = view.findViewById(R.id.btnSave);*/
 
         View view = inflater.inflate(R.layout.test_edit_fragment, container, false);
+
         mViewModel.setNameFragment("EditFragment");
         text_selected = view.findViewById(R.id.text_selected);
         text_size_array = view.findViewById(R.id.text_size_array);
         btn_update = view.findViewById(R.id.btn_update);
 
-        text_selected.setText(String.valueOf(mViewModel.getId()));
-        //mViewModel.setId(String.valueOf(mViewModel.getSelect().getValue()));
+        text_selected.setText(mViewModel.getId());
+
+        //mViewModel.getId();
         //mViewModel.setIsFlavour(null);
-        mViewModel.getDataFromSQL().observe(this, editObserver);
+        mViewModel.getLiveDataModel().observe(this,editObserver);
 
         return view;
     }
 
-    final Observer<ArrayList<ArrayList<String>>> editObserver = new Observer<ArrayList<ArrayList<String>>>() {
+    final Observer<DataModel> editObserver = new Observer<DataModel>() {
         @Override
-        public void onChanged(@Nullable ArrayList<ArrayList<String>> arrayLists) {
-            text_size_array.setText(String.valueOf(mViewModel.getDataFromSQL().getValue().get(0).get(0)));
-            Toast.makeText(getActivity(), "Add edit fragment: сработал editObserver", Toast.LENGTH_SHORT).show();
+        public void onChanged(@Nullable DataModel dataModel) {
+            liveDataModel = dataModel;
+            //text_size_array.setText(String.valueOf(mViewModel.getDataFromSQL().getValue().get(0).get(0)));
+            if (dataModel != null) {
+                getId = dataModel.getId();
+                getCategory = dataModel.getCategory();
+                getText = dataModel.getText();
+                getFavour = dataModel.getFavour();
+                getImg = dataModel.getImg();
+                getFavour = dataModel.getFavour();
+                getFragmentName = dataModel.getFragmentName();
+            }
+
+                text_size_array.setText(getId.get(0));
+
+            //Toast.makeText(getActivity(), "getFragmentName 1 = "+liveDataModel.getFragmentName(), Toast.LENGTH_SHORT).show();
         }
     };
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mViewModel.getDataFromSQL().removeObserver(editObserver);
+        mViewModel.getLiveDataModel().removeObserver(editObserver);
         mViewModel.setId(null);
         mViewModel.setIsFlavour("1");
-        mViewModel.setDataFromSQL(null);
+        mViewModel.clearLiveDataModel();
         Toast.makeText(getActivity(), "onDestroyView", Toast.LENGTH_SHORT).show();
     }
 }
