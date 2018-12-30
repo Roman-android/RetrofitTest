@@ -17,11 +17,13 @@ import java.util.ArrayList;
 
 import ru.roman.retrofittest.R;
 import ru.roman.retrofittest.interfaces.OnItemClickListener;
+import ru.roman.retrofittest.libs.ImgGlide;
 import ru.roman.retrofittest.model.DataModel;
 
 
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder> {
 
+    private ImgGlide glide;
     private OnItemClickListener listener;
 
     private ArrayList <String> mId;
@@ -40,6 +42,8 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         this.mImgPath = dataModel.getImg();
         this.context = context;
         this.listener = listener;
+
+        glide = new ImgGlide(context);
     }
 
     @NonNull
@@ -74,15 +78,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
 
         holder.categoryText.setText(category);
         holder.descText.setText(text);
-        holder.imgName.setImageURI(Uri.parse(img));
-        Glide
-                .with(context)
-                .load(img)
-                .apply(new RequestOptions()
-                        .override(100, 100)
-                        .centerCrop()
-                        .circleCrop())
-                .into(holder.imgName);
+        glide.showImg(img,100,100,holder.imgName);
 
     }
 

@@ -1,6 +1,6 @@
-package ru.roman.retrofittest.downloadText;
+package ru.roman.retrofittest.model;
 
-public class DownloadText {
+public class DownloadModel {
 
     private String id;
     private String category;
@@ -8,7 +8,6 @@ public class DownloadText {
     private String favour;
     private String img_name;
     private String message;
-
 
     public String getImg_name() {
         return img_name;

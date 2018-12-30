@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import ru.roman.retrofittest.model.DataModel;
 import ru.roman.retrofittest.utils.DownloadFromSQL;
+import ru.roman.retrofittest.workSQL.GetSQL;
 
 public class ViewModels extends AndroidViewModel {
 
@@ -18,6 +19,7 @@ public class ViewModels extends AndroidViewModel {
     }
 
     private DownloadFromSQL downloadFromSQL = new DownloadFromSQL(getApplication());
+    private GetSQL getSQL = new GetSQL();
 
     public void setSwitchFragment(String s) {
         switchFragment.setValue(s);
@@ -65,7 +67,7 @@ public class ViewModels extends AndroidViewModel {
     }
     public LiveData<DataModel> getLiveDataModel() {
         if (liveDataModel == null) {
-            liveDataModel = downloadFromSQL.downloadText(getId(), getIsFavour(), getNameFragment());
+            liveDataModel = getSQL.downloadText(getId(), getIsFavour(), getNameFragment());
         }
         return liveDataModel;
     }

@@ -1,6 +1,6 @@
-package ru.roman.retrofittest.insertText;
+package ru.roman.retrofittest.model;
 
-public class InsertText {
+public class InsertModel {
 
     private String value;
     private String message;

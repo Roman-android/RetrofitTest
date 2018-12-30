@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,17 +22,23 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.ArrayList;
 
 import ru.roman.retrofittest.R;
 import ru.roman.retrofittest.constants.Constants;
+import ru.roman.retrofittest.dialogs.ClickImgDialog;
+import ru.roman.retrofittest.libs.ImgGlide;
 import ru.roman.retrofittest.model.DataModel;
 import ru.roman.retrofittest.viewModels.ViewModels;
 
-public class AddEditFragment extends Fragment {
+public class AddEditFragment extends Fragment implements View.OnClickListener {
 
     private String LOG_ADD_EDIT = "log_add_edit";
     private ViewModels mViewModel;
+    private ImgGlide glide;
 
     ImageView fotoImg;
     EditText category;
@@ -61,6 +68,7 @@ public class AddEditFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel = ViewModelProviders.of(getActivity()).get(ViewModels.class);
+        glide = new ImgGlide(getActivity());
         setHasOptionsMenu(true);
     }
 
@@ -75,15 +83,11 @@ public class AddEditFragment extends Fragment {
         btn_favour = view.findViewById(R.id.btnFavour);
         btn_save = view.findViewById(R.id.btnSave);
 
-        /*View view = inflater.inflate(R.layout.test_edit_fragment, container, false);
-        text_selected = view.findViewById(R.id.text_selected);
-        text_size_array = view.findViewById(R.id.text_size_array);
-        btn_update = view.findViewById(R.id.btn_update);*/
-
         mViewModel.setNameFragment(Constants.EDIT_FRAGMENT);
         mViewModel.clearLiveDataModel();
         mViewModel.getLiveDataModel().observe(this, editObserver);
 
+        fotoImg.setOnClickListener(this);
 
         return view;
     }
@@ -98,23 +102,30 @@ public class AddEditFragment extends Fragment {
                 getFragmentName = liveDataModel.getFragmentName();
 
                 if (getFragmentName.equals(Constants.EDIT_FRAGMENT)) {
-                    Log.d(LOG_ADD_EDIT,"Данные загружены");
+                    Log.d(LOG_ADD_EDIT, "Данные загружены");
                     getId = liveDataModel.getId();
                     getCategory = liveDataModel.getCategory();
                     getText = liveDataModel.getText();
                     getFavour = liveDataModel.getFavour();
                     getImg = liveDataModel.getImg();
 
-                    fotoImg.setImageURI(Uri.parse(getImg.get(0)));
+                    glide.showImg(getImg.get(0), 300, 300, fotoImg);
                     category.setText(getCategory.get(0));
                     text.setText(getText.get(0));
-
-                    //text_selected.setText(mViewModel.getId());
-                    //text_size_array.setText(getText.get(0));
                 }
             }
 
         }
     };
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.foto:
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                Toast.makeText(getActivity(), "Нажал на картинку!", Toast.LENGTH_SHORT).show();
+                ClickImgDialog clickImgDialog = new ClickImgDialog();
+                clickImgDialog.show(manager,"clickImg");
+        }
+    }
 }

@@ -18,10 +18,10 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.roman.retrofittest.downloadText.DownloadText;
-import ru.roman.retrofittest.insertText.InsertText;
+import ru.roman.retrofittest.model.DownloadModel;
+import ru.roman.retrofittest.model.InsertModel;
 import ru.roman.retrofittest.model.DataModel;
-import ru.roman.retrofittest.uploadImage.UploadImage;
+import ru.roman.retrofittest.model.UploadImageModel;
 
 public class DownloadFromSQL {
 
@@ -46,13 +46,13 @@ public class DownloadFromSQL {
         //data.put("fav","1");
         data.put("id", "5");
 
-        Call<List<DownloadText>> text = downloadApi.text(data);
+        Call<List<DownloadModel>> text = downloadApi.text(data);
 */
-        Call<List<DownloadText>> text = downloadApi.text(id, isFavour);
+        Call<List<DownloadModel>> text = downloadApi.text(id, isFavour);
 
-        text.enqueue(new Callback<List<DownloadText>>() {
+        text.enqueue(new Callback<List<DownloadModel>>() {
             @Override
-            public void onResponse(@NonNull Call<List<DownloadText>> call, @NonNull Response<List<DownloadText>> response) {
+            public void onResponse(@NonNull Call<List<DownloadModel>> call, @NonNull Response<List<DownloadModel>> response) {
 
                 if (response.body() != null) {
                     dataModel.clearDataModel();
@@ -77,7 +77,7 @@ public class DownloadFromSQL {
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<DownloadText>> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<List<DownloadModel>> call, @NonNull Throwable t) {
                 Log.d(LOG_DOWNLOAD, "failure " + t);
             }
 
@@ -87,11 +87,11 @@ public class DownloadFromSQL {
     }
 
     public void postRequest() {
-        Call<InsertText> call = downloadApi.saveText("заголовок_1", "мой_текст_1", "1");
+        Call<InsertModel> call = downloadApi.saveText("заголовок_1", "мой_текст_1", "1");
 
-        call.enqueue(new Callback<InsertText>() {
+        call.enqueue(new Callback<InsertModel>() {
             @Override
-            public void onResponse(Call<InsertText> call, Response<InsertText> response) {
+            public void onResponse(Call<InsertModel> call, Response<InsertModel> response) {
                 if (response.isSuccessful()) {
                     Log.d(LOG_POST, response.body().getValue());
                     Log.d(LOG_POST, response.body().getMessage());
@@ -103,7 +103,7 @@ public class DownloadFromSQL {
             }
 
             @Override
-            public void onFailure(Call<InsertText> call, Throwable t) {
+            public void onFailure(Call<InsertModel> call, Throwable t) {
                 Log.d(LOG_POST, "LOG_POST: " + t.toString());
             }
         });
@@ -123,26 +123,28 @@ public class DownloadFromSQL {
         String categoryString = "Описание картинки";
         RequestBody category = RequestBody.create(MediaType.parse("multipart/form-data"), categoryString);
 
-        Call<UploadImage> resultCall = downloadApi.uploadImg(category, body);
-        resultCall.enqueue(new Callback<UploadImage>() {
+        Call<UploadImageModel> resultCall = downloadApi.uploadImg(category, body);
+        resultCall.enqueue(new Callback<UploadImageModel>() {
             @Override
-            public void onResponse(Call<UploadImage> call, Response<UploadImage> response) {
+            public void onResponse(@NonNull Call<UploadImageModel> call, @NonNull Response<UploadImageModel> response) {
                 progressDialog.dismiss();
-                if (response.isSuccessful()) {
-                    if (response.body().getError()) {
-                        Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                if (response.body()!=null) {
+                    if (response.isSuccessful()) {
+                        if (response.body().getError()) {
+                            Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.d(LOG_UPLOAD, "Путь к файлу: " + response.body().getMessage());
+                            imageView.setImageURI(null);
+                        }
                     } else {
                         Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d(LOG_UPLOAD, "Путь к файлу: " + response.body().getMessage());
-                        imageView.setImageURI(null);
                     }
-                } else {
-                    Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<UploadImage> call, Throwable t) {
+            public void onFailure(Call<UploadImageModel> call, Throwable t) {
                 progressDialog.dismiss();
                 Toast.makeText(context, "Непредвиденная ошибка" + t.toString(), Toast.LENGTH_SHORT).show();
                 Log.d(LOG_UPLOAD, "Непредвиденная ошибка" + t.toString());
