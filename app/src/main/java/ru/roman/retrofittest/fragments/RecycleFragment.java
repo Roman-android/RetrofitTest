@@ -30,7 +30,7 @@ import ru.roman.retrofittest.adapters.RecycleViewAdapter;
 import ru.roman.retrofittest.constants.Constants;
 import ru.roman.retrofittest.interfaces.OnItemClickListener;
 import ru.roman.retrofittest.model.DataModel;
-import ru.roman.retrofittest.viewModels.ViewModels;
+import ru.roman.retrofittest.model.RecycleViewModels;
 
 public class RecycleFragment extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -53,7 +53,7 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
     ArrayList<Integer> selectedItem = new ArrayList<>();
 
     private DataModel liveDataModel;
-    private ViewModels mViewModel;
+    private RecycleViewModels mViewModel;
     private Boolean isLongClick = false;
 
     private final String LOG_RECYCLE_FRAGMENT = "recycle_fragment";
@@ -74,7 +74,7 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_RECYCLE_FRAGMENT, "onCreate");
-        mViewModel = ViewModelProviders.of(getActivity()).get(ViewModels.class);
+        mViewModel = ViewModelProviders.of(getActivity()).get(RecycleViewModels.class);
         setHasOptionsMenu(true);
     }
 
@@ -222,7 +222,7 @@ public class RecycleFragment extends Fragment implements BottomNavigationView.On
                 } else {
                     Toast.makeText(getActivity(), "OnClick: position: " + positionItem, Toast.LENGTH_SHORT).show();
                     Toast.makeText(getActivity(), "OnClick: arrays: " + getId.get(positionItem), Toast.LENGTH_SHORT).show();
-                    mViewModel.setSwitchFragment("InfoFragment");
+                    mViewModel.setSwitchFragment(Constants.INFO_FRAGMENT);
                 }
             }
 

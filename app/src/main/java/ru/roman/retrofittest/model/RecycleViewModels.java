@@ -1,4 +1,4 @@
-package ru.roman.retrofittest.viewModels;
+package ru.roman.retrofittest.model;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -10,15 +10,13 @@ import ru.roman.retrofittest.model.DataModel;
 import ru.roman.retrofittest.utils.DownloadFromSQL;
 import ru.roman.retrofittest.workSQL.GetSQL;
 
-public class ViewModels extends AndroidViewModel {
+public class RecycleViewModels extends AndroidViewModel {
 
     private MutableLiveData<String> switchFragment = new MutableLiveData<>();
 
-    public ViewModels(@NonNull Application application) {
+    public RecycleViewModels(@NonNull Application application) {
         super(application);
     }
-
-    private DownloadFromSQL downloadFromSQL = new DownloadFromSQL(getApplication());
     private GetSQL getSQL = new GetSQL();
 
     public void setSwitchFragment(String s) {
