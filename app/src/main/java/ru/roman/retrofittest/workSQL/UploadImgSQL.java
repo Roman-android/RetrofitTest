@@ -18,7 +18,7 @@ public class UploadImgSQL extends MainSQL {
 
     private final String LOG_UPLOAD = "log_upload";
 
-    public void uploadImg(String imagePath, final ImageView imageView) {
+    public void uploadImg(String imagePath, final ImageView imageView,String id) {
 
         File file = new File(imagePath);
 
@@ -28,7 +28,7 @@ public class UploadImgSQL extends MainSQL {
         String categoryString = "Описание картинки";
         RequestBody category = RequestBody.create(MediaType.parse("multipart/form-data"), categoryString);
 
-        Call<UploadImageModel> resultCall = downloadApi.uploadImg(category, body);
+        Call<UploadImageModel> resultCall = downloadApi.uploadImg(category, body,id);
         resultCall.enqueue(new Callback<UploadImageModel>() {
             @Override
             public void onResponse(@NonNull Call<UploadImageModel> call, @NonNull Response<UploadImageModel> response) {
@@ -48,8 +48,8 @@ public class UploadImgSQL extends MainSQL {
             }
 
             @Override
-            public void onFailure(Call<UploadImageModel> call, Throwable t) {
-                Log.d(LOG_UPLOAD, "Непредвиденная ошибка" + t.toString());
+            public void onFailure(@NonNull Call<UploadImageModel> call, @NonNull Throwable t) {
+                Log.d(LOG_UPLOAD, "Непредвиденная ошибка: " + t.toString());
             }
         });
     }

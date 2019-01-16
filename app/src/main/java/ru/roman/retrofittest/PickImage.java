@@ -48,10 +48,10 @@ Context context;
         return result;
     }
 
-    public void uploadImg(ImageView fotoImg, FragmentActivity fragmentActivity) {
-        if (mEditFragmentModel.getImagePath() != null) {
+    public void uploadImg(ImageView fotoImg, FragmentActivity fragmentActivity, String imagePath) {
+        if (imagePath != null) {
             verifyStoragePermissions(fragmentActivity);
-            uploadImgSQL.uploadImg(mEditFragmentModel.getImagePath(), fotoImg);
+            //uploadImgSQL.uploadImg(mEditFragmentModel.getImagePath(), fotoImg);
             Toast.makeText(context, "Изображение выбрано!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(context, "Пожалуйста сначала выберите изображение!", Toast.LENGTH_SHORT).show();

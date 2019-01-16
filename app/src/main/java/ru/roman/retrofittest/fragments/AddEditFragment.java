@@ -42,6 +42,7 @@ public class AddEditFragment extends Fragment implements View.OnClickListener {
     private RecycleViewModels mViewModel;
     private EditFragmentViewModel mEditFragmentModel;
     private ImgGlide glide;
+    UploadImgSQL uploadImgSQL = new UploadImgSQL();
 
     public ImageView fotoImg;
     EditText category;
@@ -137,11 +138,11 @@ public class AddEditFragment extends Fragment implements View.OnClickListener {
     public void pickImg(Uri imageUri){
         fotoImg.setImageURI(imageUri);
         imagePath = pickImage.getRealPathFromURI(imageUri);
-        mEditFragmentModel.setImagePath(imagePath);
-        pickImage.uploadImg(fotoImg,getActivity());
+        //mEditFragmentModel.setImagePath(imagePath);
+        pickImage.uploadImg(fotoImg,getActivity(),imagePath);
 
-        UploadImgSQL uploadImgSQL = new UploadImgSQL();
-        uploadImgSQL.uploadImg(imagePath,fotoImg);
+
+        uploadImgSQL.uploadImg(imagePath,fotoImg,"2");
     }
 
 }

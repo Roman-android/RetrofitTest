@@ -36,7 +36,8 @@ public interface DownloadApi {
     @Multipart
     @POST("upload.php")
     Call<UploadImageModel>uploadImg(@Part ("category") RequestBody category,
-                                    @Part MultipartBody.Part file);
+                                    @Part MultipartBody.Part file,
+                                    @Query("id") String id);
 
     @PUT("put_img.php/{id}")
     Call<UploadImageModel>putImg(@Path("id")String id, @Body String img_name);
